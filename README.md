@@ -8,6 +8,12 @@ This is a user management system API built with Django and Django Rest Framework
 - Custom user model with fields like `first_name`, `last_name`, and `email`.
 - User profiles and permissions management.
 
+POSTMAN TESTING:
+
+![image](https://github.com/user-attachments/assets/89bb4323-a5e1-40d4-8ccc-3117c0427bf6)
+
+
+
 ## Requirements
 
 - Python 3.9 or higher
