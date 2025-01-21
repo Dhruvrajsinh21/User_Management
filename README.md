@@ -5,7 +5,6 @@ This is a user management system API built with Django and Django Rest Framework
 ## Features
 
 - User registration and login.
-- Custom user model with fields like `first_name`, `last_name`, and `email`.
 - User profiles and permissions management.
 
 POSTMAN TESTING:
