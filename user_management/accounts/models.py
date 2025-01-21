@@ -1,10 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 
-class CustomUser(AbstractUser):
+class User(models.Model):
+    name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-    is_deactivated = models.BooleanField(default=False)
+    password = models.CharField(max_length=255)  # Store hashed password
+    phone_number = models.CharField(max_length=15, unique=True)
+    is_active = models.BooleanField(default=True)  # For account deactivation
+    is_super_admin = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.username
+        return self.email

@@ -1,56 +1,67 @@
-from rest_framework import status, permissions, generics
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import CustomUser
-from .serializers import UserSerializer, LoginSerializer
-from django.contrib.auth import login, authenticate
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from .models import User
+from .serializers import UserSerializer, LoginSerializer, SuperAdminSerializer
+from django.contrib.auth.hashers import check_password
 
-class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-
-    def perform_create(self, serializer):
-        # Create a user
-        password = self.request.data.get('password')
-        user = serializer.save()
-        user.set_password(password)
-        user.save()
-
-class LoginView(generics.GenericAPIView):
-    serializer_class = LoginSerializer
-
+class RegisterView(APIView):
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data
-            login(request, user)
-            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+            serializer.save()
+            return Response({'message': 'User registered successfully!'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class UserDetailView(generics.RetrieveUpdateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
-
-class DeactivateUserView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
-
+class LoginView(APIView):
     def post(self, request):
-        user = request.user
-        user.is_deactivated = True
-        user.save()
-        return Response({'message': 'Account deactivated successfully'}, status=status.HTTP_200_OK)
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = User.objects.get(email=serializer.validated_data['email'])
+                if check_password(serializer.validated_data['password'], user.password):
+                    if not user.is_active:
+                        return Response({'error': 'Account is deactivated.'}, status=status.HTTP_403_FORBIDDEN)
+                    return Response({'message': 'Login successful!'})
+                return Response({'error': 'Invalid password.'}, status=status.HTTP_400_BAD_REQUEST)
+            except User.DoesNotExist:
+                return Response({'error': 'User does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class AdminUserListView(generics.ListAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+class UserDetailView(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id, is_active=True)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_superuser:
-            return CustomUser.objects.all()
-        return CustomUser.objects.none()
+    def patch(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id, is_active=True)
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'User updated successfully!'})
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            user.is_active = False
+            user.save()
+            return Response({'message': 'User account deactivated.'})
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+class SuperAdminView(APIView):
+    def get(self, request):
+        super_admin = request.query_params.get('is_super_admin', False)
+        if super_admin:
+            users = User.objects.all()
+            serializer = SuperAdminSerializer(users, many=True)
+            return Response(serializer.data)
+        return Response({'error': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)

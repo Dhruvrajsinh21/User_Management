@@ -1,19 +1,24 @@
 from rest_framework import serializers
-from .models import CustomUser
-from django.contrib.auth import authenticate
+from .models import User
+from django.contrib.auth.hashers import make_password
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['id', 'username', 'email', 'phone_number', 'is_deactivated']
-        read_only_fields = ['id']
+        model = User
+        fields = ['id', 'name', 'email', 'password', 'phone_number', 'is_active']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data['password'])
+        return super().create(validated_data)
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
-        user = authenticate(username=data['email'], password=data['password'])
-        if user is None:
-            raise serializers.ValidationError("Invalid login credentials")
-        return user
+
+class SuperAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'email', 'phone_number', 'is_active']

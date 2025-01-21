@@ -1,32 +1,25 @@
-# accounts/admin.py
-
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import User
 
-# Customize the user admin class
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    # Specify the fields you want to display in the admin interface
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'date_joined')
-    list_filter = ('is_active', 'is_staff', 'is_superuser')
-    search_fields = ('username', 'email')
-    ordering = ('-date_joined',)
-    
-    # Fields to be displayed in the detail view
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    # Fields to display in the admin list view
+    list_display = ('id', 'name', 'email', 'phone_number', 'is_active', 'is_super_admin')
+    # Fields to filter in the admin list view
+    list_filter = ('is_active', 'is_super_admin')
+    # Fields to search in the admin list view
+    search_fields = ('name', 'email', 'phone_number')
+    # Fields to sort in the admin list view
+    ordering = ('-id',)
+    # Fields to display in the edit view
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
-        ('Personal Info', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important Dates', {'fields': ('last_login', 'date_joined')}),
+        (None, {'fields': ('name', 'email', 'password', 'phone_number')}),
+        ('Permissions', {'fields': ('is_active', 'is_super_admin')}),
     )
-    # Fields that can be edited in the admin form
+    # Fields to display when creating a new user in admin
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'is_active', 'is_staff')}
-        ),
+            'fields': ('name', 'email', 'password', 'phone_number', 'is_active', 'is_super_admin'),
+        }),
     )
-
-# Register the custom user model with the admin site
-admin.site.register(CustomUser, CustomUserAdmin)
