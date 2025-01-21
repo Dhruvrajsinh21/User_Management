@@ -13,10 +13,7 @@ POSTMAN TESTING:
 ![image](https://github.com/user-attachments/assets/49618a42-2a0e-4efc-bfc4-578186b87d09)
 ![image](https://github.com/user-attachments/assets/fac1c6a8-6e7f-4fee-aba7-e70d43b26aa5)
 ![image](https://github.com/user-attachments/assets/b131920b-b202-45c3-8772-736dfa5ea0a2)
-
-
-
-
+![image](https://github.com/user-attachments/assets/e910f830-3f33-4ed6-81ca-e7e007673ba5)
 
 
 ## Requirements
