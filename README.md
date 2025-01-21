@@ -11,6 +11,12 @@ This is a user management system API built with Django and Django Rest Framework
 POSTMAN TESTING:
 
 ![image](https://github.com/user-attachments/assets/89bb4323-a5e1-40d4-8ccc-3117c0427bf6)
+![image](https://github.com/user-attachments/assets/49618a42-2a0e-4efc-bfc4-578186b87d09)
+![image](https://github.com/user-attachments/assets/fac1c6a8-6e7f-4fee-aba7-e70d43b26aa5)
+![image](https://github.com/user-attachments/assets/b131920b-b202-45c3-8772-736dfa5ea0a2)
+
+
+
 
 
 
@@ -48,49 +54,4 @@ python manage.py createsuperuser
 5. Run the development server
 ```bash
 python manage.py runserver
-```
-6. API Endpoints
-POST /register/: Register a new user.
-
-Request body:
-```json
-{
-  "username": "dhruv",
-  "email": "dhruv@example.com",
-  "password": "password123",
-  "phone_number": "1234567890"
-}
-```
-Response:
-```json
-{
-  "message": "User created successfully."
-}
-
-```
-POST /login/: Login to get a JWT token.
-
-Request body:
-```json
-{
-  "email": "dhruv@example.com",
-  "password": "password123"
-}
-
-```
-Response:
-```json
-{
-  "token": "jwt_token_here"
-}
-```
-GET /profile/: Get the current user's profile (requires JWT authentication).
-
-Response:
-```json
-{
-  "username": "dhruv",
-  "email": "dhn@example.com",
-  "phone_number": "1234567890"
-}
 ```
